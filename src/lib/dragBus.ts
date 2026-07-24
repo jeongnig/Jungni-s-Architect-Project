@@ -3,7 +3,13 @@
 export const TASK_DRAG_MOVE = "planner-task-drag-move";
 export const TASK_DRAG_END = "planner-task-drag-end";
 
-export type TaskDragDetail = { id: string; text: string; x: number; y: number };
+export type TaskDragDetail = {
+  id: string;
+  text: string;
+  subject: string | null;
+  x: number;
+  y: number;
+};
 
 export function emitTaskDragMove(detail: TaskDragDetail) {
   window.dispatchEvent(new CustomEvent<TaskDragDetail>(TASK_DRAG_MOVE, { detail }));

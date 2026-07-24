@@ -1,6 +1,9 @@
+export type TaskSubject = "구조" | "단면";
+
 export type Task = {
   id: string;
   text: string;
+  subject: TaskSubject | null;
   created_at: string;
 };
 
@@ -13,6 +16,7 @@ export type CalendarTask = {
   done: boolean;
   kind: CalendarTaskKind;
   restore_on_delete: boolean;
+  subject: TaskSubject | null;
   created_at: string;
 };
 

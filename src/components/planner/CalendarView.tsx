@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarTask, CalendarTaskKind, Task } from "@/lib/types";
-import { YEAR, WEEKDAY_LABELS, dateKey } from "@/lib/dateUtils";
+import { CalendarTask, CalendarTaskKind, Task, TaskSubject } from "@/lib/types";
+import { YEAR, WEEKDAY_LABELS, currentWeekDates, dateKey } from "@/lib/dateUtils";
 import DayCell from "./DayCell";
 import TaskPickerModal from "./TaskPickerModal";
 import WeekModal from "./WeekModal";
@@ -11,11 +11,18 @@ import MonthSummary from "./MonthSummary";
 type Props = {
   tasks: Task[];
   calendarTasks: CalendarTask[];
-  onAssign: (date: string, text: string, kind?: CalendarTaskKind) => Promise<unknown>;
-  onDropAssign: (date: string, taskId: string, text: string) => Promise<void>;
+  onAssign: (
+    date: string,
+    text: string,
+    kind?: CalendarTaskKind,
+    subject?: TaskSubject | null
+  ) => Promise<unknown>;
+  onDropAssign: (date: string, taskId: string, text: string, subject: TaskSubject | null) => Promise<void>;
   onToggleDone: (id: string, done: boolean) => void;
   onRemove: (id: string) => void;
 };
+
+type ViewMode = "month" | "week";
 
 export default function CalendarView({
   tasks,
@@ -27,6 +34,7 @@ export default function CalendarView({
 }: Props) {
   const initialMonth = new Date().getFullYear() === YEAR ? new Date().getMonth() : 0;
   const [month, setMonth] = useState(initialMonth);
+  const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [pickerDate, setPickerDate] = useState<string | null>(null);
   const [weekDate, setWeekDate] = useState<string | null>(null);
 
@@ -40,38 +48,87 @@ export default function CalendarView({
     return map;
   }, [calendarTasks]);
 
-  const firstDay = new Date(YEAR, month, 1).getDay();
-  const daysInMonth = new Date(YEAR, month + 1, 0).getDate();
   const todayStr = (() => {
     const t = new Date();
     return dateKey(t.getFullYear(), t.getMonth(), t.getDate());
   })();
 
-  const cells: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  const firstDay = new Date(YEAR, month, 1).getDay();
+  const daysInMonth = new Date(YEAR, month + 1, 0).getDate();
+
+  const monthCells: (number | null)[] = [];
+  for (let i = 0; i < firstDay; i++) monthCells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) monthCells.push(d);
+
+  const weekCells = useMemo(() => currentWeekDates(), []);
+
+  const startLabel = `${weekCells[0].getMonth() + 1}/${weekCells[0].getDate()}`;
+  const endLabel = `${weekCells[6].getMonth() + 1}/${weekCells[6].getDate()}`;
+
+  function renderDayCell(key: string, dayNum: number) {
+    return (
+      <DayCell
+        key={key}
+        dayNum={dayNum}
+        isToday={key === todayStr}
+        tasks={tasksByDate.get(key) ?? []}
+        onAdd={() => setPickerDate(key)}
+        onOpenWeek={() => setWeekDate(key)}
+        onToggleDone={onToggleDone}
+        onRemove={onRemove}
+        onDropTask={(taskId, text, subject) => onDropAssign(key, taskId, text, subject)}
+      />
+    );
+  }
 
   return (
     <div className="panel-card">
-      <div className="calendar-header">
-        <button className="nav-btn" disabled={month === 0} onClick={() => setMonth((m) => m - 1)}>
-          ‹
+      <div className="calendar-view-toggle">
+        <button
+          type="button"
+          className={viewMode === "week" ? "active" : ""}
+          onClick={() => setViewMode("week")}
+        >
+          이번 주
         </button>
-        <span className="month-pill">
-          {YEAR}년 {month + 1}월
-        </span>
-        <button className="nav-btn" disabled={month === 11} onClick={() => setMonth((m) => m + 1)}>
-          ›
+        <button
+          type="button"
+          className={viewMode === "month" ? "active" : ""}
+          onClick={() => setViewMode("month")}
+        >
+          월간
         </button>
       </div>
 
-      <div className="month-picker">
-        {Array.from({ length: 12 }, (_, m) => (
-          <button key={m} className={m === month ? "active" : ""} onClick={() => setMonth(m)}>
-            {m + 1}월
-          </button>
-        ))}
-      </div>
+      {viewMode === "month" ? (
+        <>
+          <div className="calendar-header">
+            <button className="nav-btn" disabled={month === 0} onClick={() => setMonth((m) => m - 1)}>
+              ‹
+            </button>
+            <span className="month-pill">
+              {YEAR}년 {month + 1}월
+            </span>
+            <button className="nav-btn" disabled={month === 11} onClick={() => setMonth((m) => m + 1)}>
+              ›
+            </button>
+          </div>
+
+          <div className="month-picker">
+            {Array.from({ length: 12 }, (_, m) => (
+              <button key={m} className={m === month ? "active" : ""} onClick={() => setMonth(m)}>
+                {m + 1}월
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="calendar-header">
+          <span className="month-pill">
+            이번 주 ({startLabel} ~ {endLabel})
+          </span>
+        </div>
+      )}
 
       <p className="hint">
         리스트의 항목을 <strong>드래그해서 날짜 칸에 놓거나</strong> <strong>+</strong>로 할일을 배정하고,
@@ -79,30 +136,23 @@ export default function CalendarView({
       </p>
 
       <div className="calendar-body">
-        <div className="calendar-scroll">
+        <div className="calendar-scroll calendar-transition" key={viewMode}>
           <div className="calendar-weekdays">
             {WEEKDAY_LABELS.map((w) => (
               <span key={w}>{w}</span>
             ))}
           </div>
           <div className="calendar-grid">
-            {cells.map((d, i) => {
-              if (d === null) return <div key={`e${i}`} className="day-cell empty" />;
-              const key = dateKey(YEAR, month, d);
-              return (
-                <DayCell
-                  key={key}
-                  dayNum={d}
-                  isToday={key === todayStr}
-                  tasks={tasksByDate.get(key) ?? []}
-                  onAdd={() => setPickerDate(key)}
-                  onOpenWeek={() => setWeekDate(key)}
-                  onToggleDone={onToggleDone}
-                  onRemove={onRemove}
-                  onDropTask={(taskId, text) => onDropAssign(key, taskId, text)}
-                />
-              );
-            })}
+            {viewMode === "month"
+              ? monthCells.map((d, i) => {
+                  if (d === null) return <div key={`e${i}`} className="day-cell empty" />;
+                  const key = dateKey(YEAR, month, d);
+                  return renderDayCell(key, d);
+                })
+              : weekCells.map((dt) => {
+                  const key = dateKey(dt.getFullYear(), dt.getMonth(), dt.getDate());
+                  return renderDayCell(key, dt.getDate());
+                })}
           </div>
         </div>
         <MonthSummary year={YEAR} month={month} calendarTasks={calendarTasks} />
@@ -112,8 +162,8 @@ export default function CalendarView({
         <TaskPickerModal
           dateStr={pickerDate}
           tasks={tasks}
-          onPick={async (text, kind) => {
-            await onAssign(pickerDate, text, kind);
+          onPick={async (text, kind, subject) => {
+            await onAssign(pickerDate, text, kind, subject);
             setPickerDate(null);
           }}
           onClose={() => setPickerDate(null)}

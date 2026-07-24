@@ -1,19 +1,22 @@
 "use client";
 
 import { FormEvent, PointerEvent as ReactPointerEvent, useState } from "react";
-import { Task } from "@/lib/types";
+import { Task, TaskSubject } from "@/lib/types";
+import { TASK_SUBJECTS } from "@/lib/constants";
 import { emitTaskDragEnd, emitTaskDragMove } from "@/lib/dragBus";
+import SubjectTag from "./SubjectTag";
 
 type Props = {
   tasks: Task[];
   loading: boolean;
-  onAdd: (text: string) => void;
+  onAdd: (text: string, subject: TaskSubject | null) => void;
   onUpdate: (id: string, text: string) => void;
   onDelete: (id: string) => void;
 };
 
 export default function MasterTaskList({ tasks, loading, onAdd, onUpdate, onDelete }: Props) {
   const [input, setInput] = useState("");
+  const [subject, setSubject] = useState<TaskSubject | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [touchGhost, setTouchGhost] = useState<{ text: string; x: number; y: number } | null>(null);
@@ -22,7 +25,7 @@ export default function MasterTaskList({ tasks, loading, onAdd, onUpdate, onDele
     e.preventDefault();
     const v = input.trim();
     if (!v) return;
-    onAdd(v);
+    onAdd(v, subject);
     setInput("");
   }
 
@@ -50,10 +53,10 @@ export default function MasterTaskList({ tasks, loading, onAdd, onUpdate, onDele
 
     function handleMove(ev: PointerEvent) {
       setTouchGhost({ text: task.text, x: ev.clientX, y: ev.clientY });
-      emitTaskDragMove({ id: task.id, text: task.text, x: ev.clientX, y: ev.clientY });
+      emitTaskDragMove({ id: task.id, text: task.text, subject: task.subject, x: ev.clientX, y: ev.clientY });
     }
     function handleUp(ev: PointerEvent) {
-      emitTaskDragEnd({ id: task.id, text: task.text, x: ev.clientX, y: ev.clientY });
+      emitTaskDragEnd({ id: task.id, text: task.text, subject: task.subject, x: ev.clientX, y: ev.clientY });
       setTouchGhost(null);
       window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("pointerup", handleUp);
@@ -79,6 +82,25 @@ export default function MasterTaskList({ tasks, loading, onAdd, onUpdate, onDele
         />
         <button type="submit">추가</button>
       </form>
+      <div className="subject-picker">
+        <button
+          type="button"
+          className={`subject-picker-btn${subject === null ? " active" : ""}`}
+          onClick={() => setSubject(null)}
+        >
+          과목 없음
+        </button>
+        {TASK_SUBJECTS.map((s) => (
+          <button
+            type="button"
+            key={s}
+            className={`subject-picker-btn ${s === "구조" ? "subject-gu" : "subject-dan"}${subject === s ? " active" : ""}`}
+            onClick={() => setSubject(s)}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
       {loading ? (
         <p className="empty-msg">불러오는 중...</p>
       ) : tasks.length === 0 ? (
@@ -101,13 +123,14 @@ export default function MasterTaskList({ tasks, loading, onAdd, onUpdate, onDele
                 />
               ) : (
                 <>
+                  {task.subject && <SubjectTag subject={task.subject} />}
                   <span
                     className="task-chip-text"
                     draggable
                     onDragStart={(e) => {
                       e.dataTransfer.setData(
                         "text/plain",
-                        JSON.stringify({ id: task.id, text: task.text })
+                        JSON.stringify({ id: task.id, text: task.text, subject: task.subject })
                       );
                       e.dataTransfer.effectAllowed = "copy";
                     }}

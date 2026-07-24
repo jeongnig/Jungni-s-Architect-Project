@@ -1,7 +1,7 @@
 "use client";
 
 import { DragEvent, useEffect, useRef, useState } from "react";
-import { CalendarTask } from "@/lib/types";
+import { CalendarTask, TaskSubject } from "@/lib/types";
 import { TASK_DRAG_END, TASK_DRAG_MOVE, TaskDragDetail } from "@/lib/dragBus";
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
   onOpenWeek: () => void;
   onToggleDone: (id: string, done: boolean) => void;
   onRemove: (id: string) => void;
-  onDropTask: (taskId: string, text: string) => void;
+  onDropTask: (taskId: string, text: string, subject: TaskSubject | null) => void;
 };
 
 export default function DayCell({
@@ -42,8 +42,8 @@ export default function DayCell({
       setIsDragOver(isInside(x, y));
     }
     function onTouchEnd(e: Event) {
-      const { id, text, x, y } = (e as CustomEvent<TaskDragDetail>).detail;
-      if (isInside(x, y)) onDropTask(id, text);
+      const { id, text, subject, x, y } = (e as CustomEvent<TaskDragDetail>).detail;
+      if (isInside(x, y)) onDropTask(id, text, subject as TaskSubject | null);
       setIsDragOver(false);
     }
     window.addEventListener(TASK_DRAG_MOVE, onTouchMove);
@@ -70,8 +70,12 @@ export default function DayCell({
     const raw = e.dataTransfer.getData("text/plain");
     if (!raw) return;
     try {
-      const { id, text } = JSON.parse(raw) as { id: string; text: string };
-      if (id && text) onDropTask(id, text);
+      const { id, text, subject } = JSON.parse(raw) as {
+        id: string;
+        text: string;
+        subject: TaskSubject | null;
+      };
+      if (id && text) onDropTask(id, text, subject ?? null);
     } catch {
       // 외부에서 온 일반 텍스트 드래그 등 형식이 다르면 무시
     }

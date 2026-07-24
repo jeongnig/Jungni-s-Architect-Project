@@ -4,11 +4,14 @@
 create extension if not exists "pgcrypto";
 
 -- 1) 내가 해야할 공부들 리스트 (마스터 목록)
+-- subject: 과목 태그 ('구조' | '단면' | null=미지정)
 create table if not exists tasks (
   id uuid primary key default gen_random_uuid(),
   text text not null,
+  subject text,
   created_at timestamptz not null default now()
 );
+alter table tasks add column if not exists subject text;
 
 -- 2) 캘린더에 배정된 항목
 -- kind='study': 공부 리스트에서 고르거나 드래그해서 넣은 할일 (체크박스로 완료 표시)
@@ -37,6 +40,9 @@ end $$;
 -- restore_on_delete: 드래그로 리스트에서 옮겨온 항목인지 표시.
 -- true인 항목을 캘린더에서 지우면 "내가 해야할 공부들 리스트"로 다시 돌아간다.
 alter table calendar_tasks add column if not exists restore_on_delete boolean not null default false;
+
+-- subject: 과목 태그 ('구조' | '단면' | null), 리스트에서 넘어온 값을 그대로 들고 있는다.
+alter table calendar_tasks add column if not exists subject text;
 
 -- 3) 오답노트 (날짜 단위)
 create table if not exists wrong_notes (

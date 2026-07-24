@@ -2,12 +2,13 @@
 
 import { FormEvent, useState } from "react";
 import Modal from "../ui/Modal";
-import { CalendarTaskKind, Task } from "@/lib/types";
+import { CalendarTaskKind, Task, TaskSubject } from "@/lib/types";
+import SubjectTag from "./SubjectTag";
 
 type Props = {
   dateStr: string;
   tasks: Task[];
-  onPick: (text: string, kind: CalendarTaskKind) => void;
+  onPick: (text: string, kind: CalendarTaskKind, subject: TaskSubject | null) => void;
   onClose: () => void;
 };
 
@@ -19,7 +20,7 @@ export default function TaskPickerModal({ dateStr, tasks, onPick, onClose }: Pro
     e.preventDefault();
     const v = customText.trim();
     if (!v) return;
-    onPick(v, "event");
+    onPick(v, "event", null);
   }
 
   return (
@@ -41,7 +42,13 @@ export default function TaskPickerModal({ dateStr, tasks, onPick, onClose }: Pro
           <ul className="picker-list">
             {tasks.map((task) => (
               <li key={task.id}>
-                <button onClick={() => onPick(task.text, "study")}>{task.text}</button>
+                <button
+                  className="picker-list-btn"
+                  onClick={() => onPick(task.text, "study", task.subject)}
+                >
+                  {task.subject && <SubjectTag subject={task.subject} />}
+                  <span>{task.text}</span>
+                </button>
               </li>
             ))}
           </ul>

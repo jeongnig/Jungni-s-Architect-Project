@@ -3,28 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --blue-900: #1e3a8a;
-  --blue-700: #1d4ed8;
-  --blue-600: #2563eb;
-  --blue-500: #3b82f6;
-  --blue-400: #60a5fa;
-  --blue-300: #93c5fd;
-  --blue-100: #dbeafe;
-  --blue-50: #eff6ff;
+  --navy-900: #26215c;
+  --warm-gray-600: #5f5e5a;
+
+  --pink-50: #fbeaf0;
+  --pink-100: #f6d3e1;
+  --pink-300: #e8a0be;
+  --pink-400: #dd7ca0;
+  --pink-500: #d4537e;
+  --pink-600: #bc3e68;
+  --pink-700: #993556;
+
+  --violet-700: #534ab7;
+  --violet-600: #645ab0;
+  --violet-500: #7d72c8;
+  --violet-400: #9c93dd;
+  --violet-100: #e3e0fb;
+  --violet-50: #eeedfe;
 
   --teal-700: #0f766e;
   --teal-600: #0d9488;
   --teal-500: #14b8a6;
   --teal-400: #2dd4bf;
   --teal-100: #ccfbf1;
-  --teal-50: #f0fdfa;
-
-  --violet-700: #6d28d9;
-  --violet-600: #7c3aed;
-  --violet-500: #8b5cf6;
-  --violet-400: #a78bfa;
-  --violet-100: #ede9fe;
-  --violet-50: #f5f3ff;
+  --teal-50: #e1f5ee;
 
   --amber-700: #b45309;
   --amber-600: #d97706;
@@ -33,19 +35,19 @@
   --amber-100: #fef3c7;
   --amber-50: #fffbeb;
 
-  --sun-accent: #f43f5e;
+  --sun-accent: var(--pink-700);
   --gray-700: #374151;
   --gray-500: #6b7280;
   --gray-200: #e5e7eb;
   --red-500: #ef4444;
-  --radius: 18px;
+  --radius: 14px;
 
-  /* 섹션별 포인트 컬러 (기본값 = 파랑, 섹션 클래스가 덮어씀) */
-  --accent-400: var(--blue-400);
-  --accent-700: var(--blue-700);
+  /* 섹션별 포인트 컬러 (기본값 = 핑크, 섹션 클래스가 덮어씀) */
+  --accent-400: var(--pink-400);
+  --accent-700: var(--pink-700);
 }
 
-.section-planner { --accent-400: var(--blue-400); --accent-700: var(--blue-700); }
+.section-planner { --accent-400: var(--pink-400); --accent-700: var(--pink-700); }
 .section-exams { --accent-400: var(--violet-400); --accent-700: var(--violet-700); }
 .section-notes { --accent-400: var(--teal-400); --accent-700: var(--teal-700); }
 
@@ -59,15 +61,15 @@ body {
   letter-spacing: -0.01em;
   color: var(--gray-700);
   background:
-    radial-gradient(760px circle at 12% -8%, rgba(147, 197, 253, 0.5), transparent 60%),
-    radial-gradient(640px circle at 108% 10%, rgba(196, 181, 253, 0.4), transparent 55%),
-    radial-gradient(600px circle at 45% 118%, rgba(153, 246, 228, 0.35), transparent 55%),
-    linear-gradient(160deg, #dbe8fb 0%, #eef4fc 45%, #f7fafc 100%);
+    radial-gradient(760px circle at 12% -8%, rgba(251, 234, 240, 0.9), transparent 60%),
+    radial-gradient(640px circle at 108% 10%, rgba(238, 237, 254, 0.8), transparent 55%),
+    radial-gradient(600px circle at 45% 118%, rgba(225, 245, 238, 0.7), transparent 55%),
+    linear-gradient(160deg, #fdf7f9 0%, #f8f6fb 45%, #f9fcfb 100%);
   background-attachment: fixed, fixed, fixed, fixed;
 }
 
 input[type="checkbox"] {
-  accent-color: var(--blue-600);
+  accent-color: var(--pink-500);
   width: 15px;
   height: 15px;
 }
@@ -75,17 +77,19 @@ input[type="checkbox"] {
 input:focus-visible,
 textarea:focus-visible {
   outline: none;
-  border-color: var(--blue-400);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+  border-color: var(--pink-400);
+  box-shadow: 0 0 0 3px rgba(212, 83, 126, 0.18);
 }
 
 button {
+  cursor: pointer;
+  font-family: inherit;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
 }
 
 a { transition: background-color 0.15s ease, color 0.15s ease; }
 
-/* page shell: mimics a planner "page" sitting on a colored desk background */
+/* page shell */
 .page-shell {
   min-height: 100vh;
   display: flex;
@@ -99,13 +103,13 @@ a { transition: background-color 0.15s ease, color 0.15s ease; }
   background: #fbfdff;
   border-radius: 28px;
   overflow: hidden;
-  box-shadow: 0 30px 70px -28px rgba(30, 58, 138, 0.4), 0 4px 14px rgba(30, 58, 138, 0.1);
+  box-shadow: 0 30px 70px -28px rgba(38, 33, 92, 0.35), 0 4px 14px rgba(38, 33, 92, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.7);
 }
 
 .app-header {
-  background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
-  color: #fff;
+  background: #fff;
+  border-bottom: 1px solid #f4eef2;
   padding: 22px 20px;
   display: flex;
   align-items: center;
@@ -123,18 +127,19 @@ a { transition: background-color 0.15s ease, color 0.15s ease; }
 .app-header h1 {
   font-size: 1.25rem;
   margin: 0;
+  color: var(--navy-900);
 }
 
 .app-subtitle {
   margin: 0;
   font-size: 0.78rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--warm-gray-600);
 }
 
 .dday-badge {
-  background: #fff;
-  color: var(--blue-700);
+  background: var(--pink-50);
+  color: var(--pink-700);
   font-weight: 800;
   font-size: 1.05rem;
   padding: 8px 16px;
@@ -144,52 +149,40 @@ a { transition: background-color 0.15s ease, color 0.15s ease; }
 }
 
 @keyframes dday-glow {
-  0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
-  50% { box-shadow: 0 4px 18px rgba(255, 255, 255, 0.55), 0 4px 12px rgba(0, 0, 0, 0.1); }
+  0%, 100% { box-shadow: 0 4px 12px rgba(212, 83, 126, 0.12); }
+  50% { box-shadow: 0 4px 18px rgba(212, 83, 126, 0.32); }
 }
 
 .tabs {
   display: flex;
   gap: 6px;
-  background: var(--blue-50);
-  padding: 6px;
-  margin: 16px 16px 0;
-  border-radius: 999px;
+  background: #fff;
+  padding: 0 16px;
+  margin: 0;
+  border-bottom: 1px solid #f4eef2;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 10px 8px;
+  padding: 14px 8px;
   border: none;
   background: transparent;
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--blue-700);
-  opacity: 0.55;
+  color: var(--warm-gray-600);
+  opacity: 1;
   cursor: pointer;
-  border-radius: 999px;
-  transition: all 0.15s ease;
+  border-radius: 0;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.tab-btn:hover { opacity: 0.8; }
+.tab-btn:hover { color: var(--navy-900); }
 
 .tab-btn.active {
-  opacity: 1;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-}
-
-.tab-btn.active:hover { opacity: 1; }
-
-/* 탭마다 이동할 섹션의 포인트 컬러를 살짝 미리 보여준다 (플래너=파랑/기출문제=보라/오답노트=청록) */
-.tabs .tab-btn:nth-child(2).active {
-  color: var(--violet-700);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.22);
-}
-
-.tabs .tab-btn:nth-child(3).active {
-  color: var(--teal-700);
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.22);
+  color: var(--navy-900);
+  background: transparent;
+  border-bottom-color: var(--pink-500);
 }
 
 main {
@@ -205,12 +198,12 @@ main {
   border-radius: var(--radius);
   padding: 18px 18px 18px 22px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 4px rgba(30, 58, 138, 0.07);
+  box-shadow: 0 4px 20px rgba(212, 83, 126, 0.08);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .panel-card:hover {
-  box-shadow: 0 10px 28px -12px rgba(30, 58, 138, 0.18), 0 1px 4px rgba(30, 58, 138, 0.07);
+  box-shadow: 0 10px 26px rgba(212, 83, 126, 0.14);
 }
 
 .panel-card::before {
@@ -224,7 +217,7 @@ main {
 .panel-card h2 {
   margin-top: 0;
   font-size: 1.08rem;
-  color: var(--blue-900);
+  color: var(--navy-900);
   font-weight: 800;
 }
 
@@ -232,6 +225,143 @@ main {
   font-size: 0.82rem;
   color: var(--gray-500);
   margin: 4px 0 12px;
+}
+
+/* stat cards */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(212, 83, 126, 0.08);
+}
+
+.stat-card-purple { background: var(--violet-50); }
+.stat-card-pink { background: var(--pink-50); }
+.stat-card-teal { background: var(--teal-50); }
+
+.stat-card-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--warm-gray-600);
+}
+
+.stat-card-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--navy-900);
+}
+
+.stat-card-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.stat-card-bar-fill {
+  height: 100%;
+  background: var(--pink-500);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+@media (max-width: 560px) {
+  .stat-cards { grid-template-columns: 1fr; }
+}
+
+/* subject tag / picker */
+.subject-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-right: 5px;
+  white-space: nowrap;
+}
+
+.subject-tag.subject-gu { background: var(--violet-50); color: var(--violet-700); }
+.subject-tag.subject-dan { background: var(--pink-50); color: var(--pink-700); }
+
+.subject-picker {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.subject-picker-btn {
+  border: 1px solid var(--gray-200);
+  background: #fff;
+  color: var(--gray-500);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.subject-picker-btn.subject-gu.active { background: var(--violet-50); border-color: var(--violet-400); color: var(--violet-700); }
+.subject-picker-btn.subject-dan.active { background: var(--pink-50); border-color: var(--pink-400); color: var(--pink-700); }
+.subject-picker-btn.active:not(.subject-gu):not(.subject-dan) { background: var(--gray-200); color: var(--navy-900); }
+
+/* today checklist */
+.today-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.today-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.today-check-circle {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--pink-300);
+  background: #fff;
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.today-check-circle:hover { transform: scale(1.08); }
+
+.today-check-circle.checked {
+  background: var(--pink-500);
+  border-color: var(--pink-500);
+}
+
+.today-check-text {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  transition: color 0.3s ease;
+}
+
+.today-checklist li.done .today-check-text {
+  text-decoration: line-through;
+  color: var(--gray-500);
 }
 
 /* task list */
@@ -249,14 +379,10 @@ main {
   font-size: 0.95rem;
 }
 
-button {
-  cursor: pointer;
-  font-family: inherit;
-}
-
 .task-input-row button,
-.note-form button {
-  background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+.note-form button,
+.task-picker-custom-form button {
+  background: linear-gradient(135deg, var(--pink-600), var(--pink-500));
   color: #fff;
   border: none;
   border-radius: 999px;
@@ -265,24 +391,18 @@ button {
 }
 
 .task-input-row button:hover,
-.note-form button:hover {
+.note-form button:hover,
+.task-picker-custom-form button:hover {
   filter: brightness(1.05);
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.5);
+  box-shadow: 0 8px 16px -6px rgba(212, 83, 126, 0.5);
 }
 
 .task-input-row button:active,
-.note-form button:active {
+.note-form button:active,
+.task-picker-custom-form button:active {
   transform: translateY(0);
   box-shadow: none;
-}
-
-.section-notes .note-form button {
-  background: linear-gradient(135deg, var(--teal-600), var(--teal-500));
-}
-
-.section-notes .note-form button:hover {
-  box-shadow: 0 8px 16px -6px rgba(13, 148, 136, 0.5);
 }
 
 .master-task-list {
@@ -299,15 +419,15 @@ button {
   align-items: center;
   gap: 6px;
   max-width: 100%;
-  background: var(--blue-50);
+  background: var(--pink-50);
   border-radius: 999px;
   padding: 6px 6px 6px 14px;
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .task-chip:hover {
-  background: var(--blue-100);
-  box-shadow: 0 4px 10px -4px rgba(37, 99, 235, 0.3);
+  background: var(--pink-100);
+  box-shadow: 0 4px 10px -4px rgba(212, 83, 126, 0.35);
 }
 
 .task-chip-text {
@@ -327,22 +447,22 @@ button {
   position: fixed;
   z-index: 200;
   transform: translate(-50%, -130%);
-  background: var(--blue-600);
+  background: var(--pink-500);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 700;
   padding: 6px 14px;
   border-radius: 999px;
   pointer-events: none;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 16px rgba(212, 83, 126, 0.35);
   white-space: nowrap;
 }
 
 .task-chip-del {
   flex-shrink: 0;
   border: none;
-  background: var(--blue-100);
-  color: var(--blue-700);
+  background: var(--pink-100);
+  color: var(--pink-700);
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -354,7 +474,7 @@ button {
 
 .task-chip input[type="text"] {
   padding: 4px 8px;
-  border: 1px solid var(--blue-300);
+  border: 1px solid var(--pink-300);
   border-radius: 999px;
   font-size: 0.82rem;
   width: 160px;
@@ -364,16 +484,16 @@ button {
 .icon-btn {
   border: none;
   background: none;
-  color: var(--blue-600);
+  color: var(--pink-600);
   font-size: 0.85rem;
   padding: 4px 8px;
   border-radius: 999px;
   font-weight: 600;
+  transition: background-color 0.15s ease;
 }
 
 .icon-btn.danger { color: var(--red-500); }
-.icon-btn { transition: background-color 0.15s ease; }
-.icon-btn:hover { background: var(--blue-100); }
+.icon-btn:hover { background: var(--pink-100); }
 
 .empty-msg {
   color: var(--gray-500);
@@ -382,6 +502,31 @@ button {
 }
 
 /* calendar */
+.calendar-view-toggle {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--gray-200);
+  padding: 4px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.calendar-view-toggle button {
+  border: none;
+  background: transparent;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 999px;
+}
+
+.calendar-view-toggle button.active {
+  background: var(--pink-500);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(212, 83, 126, 0.3);
+}
+
 .calendar-header {
   display: flex;
   align-items: center;
@@ -394,14 +539,14 @@ button {
   display: inline-block;
   min-width: 140px;
   text-align: center;
-  background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+  background: linear-gradient(135deg, var(--pink-600), var(--pink-500));
   color: #fff;
   font-weight: 800;
   font-style: italic;
   padding: 8px 22px;
   border-radius: 999px;
   font-size: 1rem;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 10px rgba(212, 83, 126, 0.25);
 }
 
 .nav-btn {
@@ -411,11 +556,11 @@ button {
   width: 34px;
   height: 34px;
   font-size: 1.1rem;
-  color: var(--blue-700);
+  color: var(--navy-900);
+  transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
-.nav-btn { transition: background-color 0.15s ease, transform 0.15s ease; }
-.nav-btn:hover:not(:disabled) { background: var(--blue-50); transform: scale(1.06); }
+.nav-btn:hover:not(:disabled) { background: var(--pink-50); transform: scale(1.06); }
 .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .month-picker {
@@ -436,8 +581,8 @@ button {
 }
 
 .month-picker button.active {
-  background: var(--blue-600);
-  border-color: var(--blue-600);
+  background: var(--pink-500);
+  border-color: var(--pink-500);
   color: #fff;
 }
 
@@ -452,6 +597,13 @@ button {
   overflow-x: auto;
 }
 
+.calendar-transition { animation: calendar-fade 0.2s ease; }
+
+@keyframes calendar-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -463,7 +615,7 @@ button {
 }
 
 .calendar-weekdays span:first-child { color: var(--sun-accent); }
-.calendar-weekdays span:last-child { color: var(--blue-700); }
+.calendar-weekdays span:last-child { color: var(--navy-900); }
 
 .calendar-grid {
   display: grid;
@@ -472,10 +624,10 @@ button {
 }
 
 .calendar-grid > :nth-child(7n+1) .day-num { color: var(--sun-accent); }
-.calendar-grid > :nth-child(7n) .day-num { color: var(--blue-700); }
+.calendar-grid > :nth-child(7n) .day-num { color: var(--navy-900); }
 
 .day-cell {
-  background: var(--blue-50);
+  background: #f8f6fa;
   border-radius: 12px;
   min-height: 92px;
   padding: 6px;
@@ -490,13 +642,13 @@ button {
 .day-cell.has-event { background: #e2e8f0; }
 
 .day-cell.today {
-  outline: 2px solid var(--blue-600);
+  outline: 2px solid var(--pink-500);
   background: #fff;
 }
 
 .day-cell.drag-over {
-  outline: 2px dashed var(--blue-500);
-  background: var(--blue-100);
+  outline: 2px dashed var(--pink-400);
+  background: var(--pink-50);
 }
 
 .day-cell-top {
@@ -508,20 +660,17 @@ button {
 .day-num {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--blue-900);
+  color: var(--navy-900);
   cursor: pointer;
   padding: 2px 4px;
   border-radius: 4px;
+  transition: background-color 0.15s ease;
 }
 
-.day-num { transition: background-color 0.15s ease; }
-.day-num:hover { background: var(--blue-100); }
-
-.add-task-btn { transition: transform 0.15s ease, background-color 0.15s ease; }
-.add-task-btn:hover { transform: scale(1.15); background: var(--blue-700); }
+.day-num:hover { background: var(--pink-100); }
 
 .calendar-grid .day-cell.today .day-num {
-  background: var(--blue-600);
+  background: var(--pink-500);
   color: #fff;
   border-radius: 999px;
   padding: 2px 7px;
@@ -529,7 +678,7 @@ button {
 
 .add-task-btn {
   border: none;
-  background: var(--blue-600);
+  background: var(--pink-500);
   color: #fff;
   width: 18px;
   height: 18px;
@@ -537,7 +686,10 @@ button {
   border-radius: 50%;
   font-size: 0.75rem;
   padding: 0;
+  transition: transform 0.15s ease, background-color 0.15s ease;
 }
+
+.add-task-btn:hover { transform: scale(1.15); background: var(--pink-700); }
 
 .day-task-list {
   list-style: none;
@@ -587,7 +739,7 @@ button {
 /* month summary panel (calendar 아래 가로 바 형태) */
 .month-summary-panel {
   width: 100%;
-  background: var(--blue-50);
+  background: var(--pink-50);
   border-radius: 14px;
   padding: 12px 16px;
   display: flex;
@@ -598,7 +750,7 @@ button {
 
 .month-summary-title {
   font-weight: 800;
-  color: var(--blue-900);
+  color: var(--navy-900);
   font-size: 0.85rem;
   white-space: nowrap;
 }
@@ -609,27 +761,27 @@ button {
   white-space: nowrap;
 }
 
-.month-summary-stat strong { color: var(--blue-700); }
+.month-summary-stat strong { color: var(--pink-700); }
 
 .month-summary-bar {
   flex: 1;
   min-width: 90px;
   height: 8px;
-  background: var(--blue-100);
+  background: var(--pink-100);
   border-radius: 999px;
   overflow: hidden;
 }
 
 .month-summary-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--blue-500), var(--blue-700));
+  background: linear-gradient(90deg, var(--pink-500), var(--pink-700));
   border-radius: 999px;
   transition: width 0.3s ease;
 }
 
 .month-summary-pct {
   font-size: 0.78rem;
-  color: var(--blue-600);
+  color: var(--pink-600);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -664,7 +816,7 @@ button {
 .exam-link-card:hover {
   background: var(--violet-100);
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px -10px rgba(124, 58, 237, 0.35);
+  box-shadow: 0 10px 20px -10px rgba(83, 74, 183, 0.35);
 }
 
 .exam-link-icon {
@@ -672,7 +824,7 @@ button {
   height: 44px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
+  background: linear-gradient(135deg, var(--violet-500), var(--violet-700));
   color: #fff;
   font-weight: 800;
   font-size: 1.05rem;
@@ -869,13 +1021,13 @@ button {
   overflow: hidden;
   border: 1px solid var(--gray-200);
   padding: 0;
-  background: var(--blue-50);
+  background: var(--teal-50);
 }
 
 .note-gallery-thumb { transition: outline-color 0.2s ease, box-shadow 0.2s ease; }
 .note-gallery-thumb:hover {
-  outline: 2px solid var(--blue-400);
-  box-shadow: 0 8px 16px -8px rgba(37, 99, 235, 0.4);
+  outline: 2px solid var(--teal-400);
+  box-shadow: 0 8px 16px -8px rgba(13, 148, 136, 0.4);
 }
 
 .note-gallery-thumb img {
@@ -899,8 +1051,8 @@ button {
   color: #fff;
 }
 
-.note-gallery-badge.problem { background: rgba(124, 58, 237, 0.85); }
-.note-gallery-badge.mine { background: rgba(37, 99, 235, 0.85); }
+.note-gallery-badge.problem { background: rgba(83, 74, 183, 0.85); }
+.note-gallery-badge.mine { background: rgba(212, 83, 126, 0.85); }
 .note-gallery-badge.model { background: rgba(220, 38, 38, 0.85); }
 
 .note-gallery-empty {
@@ -936,7 +1088,7 @@ button {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 -12px 40px -12px rgba(30, 58, 138, 0.3);
+  box-shadow: 0 -12px 40px -12px rgba(38, 33, 92, 0.3);
   animation: modal-slide-up 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -957,7 +1109,7 @@ button {
 
 .modal-header h3 {
   margin: 0;
-  color: var(--blue-900);
+  color: var(--navy-900);
   font-size: 1.05rem;
 }
 
@@ -976,14 +1128,14 @@ button {
 
 /* week modal content */
 .week-summary {
-  background: var(--blue-50);
+  background: var(--pink-50);
   border-radius: 12px;
   padding: 12px 14px;
   margin-bottom: 14px;
   font-size: 0.9rem;
 }
 
-.week-summary strong { color: var(--blue-700); }
+.week-summary strong { color: var(--pink-700); }
 
 .week-day-block {
   border-bottom: 1px solid var(--gray-200);
@@ -996,14 +1148,14 @@ button {
   display: flex;
   justify-content: space-between;
   font-weight: 700;
-  color: var(--blue-900);
+  color: var(--navy-900);
   font-size: 0.88rem;
   margin-bottom: 6px;
 }
 
 .week-day-header .frac {
   font-weight: 600;
-  color: var(--blue-600);
+  color: var(--pink-600);
   font-size: 0.8rem;
 }
 
@@ -1038,8 +1190,8 @@ button {
 }
 
 .picker-list button:hover {
-  background: var(--blue-50);
-  border-color: var(--blue-500);
+  background: var(--pink-50);
+  border-color: var(--pink-400);
 }
 
 .task-picker-custom-form {
@@ -1057,18 +1209,8 @@ button {
 }
 
 .task-picker-custom-form button {
-  background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
-  color: #fff;
-  border: none;
-  border-radius: 999px;
   padding: 9px 16px;
-  font-weight: 700;
   font-size: 0.85rem;
-}
-
-.task-picker-custom-form button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 16px -6px rgba(37, 99, 235, 0.5);
 }
 
 .task-picker-divider {
@@ -1134,7 +1276,7 @@ button {
 .exam-review-table-wrap::-webkit-scrollbar-thumb,
 .day-task-list::-webkit-scrollbar-thumb,
 .modal-body::-webkit-scrollbar-thumb {
-  background: var(--blue-300);
+  background: var(--pink-300);
   border-radius: 999px;
 }
 

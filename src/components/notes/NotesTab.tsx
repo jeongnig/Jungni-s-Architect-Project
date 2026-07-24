@@ -7,6 +7,7 @@ import { NoteImageKind, WrongNote, WrongNoteImage, WrongNoteWithImages } from "@
 import NoteForm from "./NoteForm";
 import NoteList from "./NoteList";
 import NoteDetailModal from "./NoteDetailModal";
+import NoteMemoList from "./NoteMemoList";
 
 type NoteRow = WrongNote & { wrong_note_images: WrongNoteImage[] | null };
 
@@ -38,13 +39,14 @@ export default function NotesTab({ active }: { active: boolean }) {
 
   async function createNote(
     date: string,
+    memo: string,
     problemFiles: File[],
     mineFiles: File[],
     modelFiles: File[]
   ) {
     const { data: note, error } = await supabase
       .from("wrong_notes")
-      .insert({ date })
+      .insert({ date, memo: memo || null })
       .select()
       .single();
     if (error || !note) throw error ?? new Error("오답노트 생성에 실패했어요.");
@@ -76,6 +78,17 @@ export default function NotesTab({ active }: { active: boolean }) {
     setNotes((prev) => [{ ...(note as WrongNote), images: imageRows }, ...prev]);
   }
 
+  async function updateNoteMemo(id: string, memo: string) {
+    const value = memo.trim() || null;
+    const previous = notes;
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, memo: value } : n)));
+    const { error } = await supabase.from("wrong_notes").update({ memo: value }).eq("id", id);
+    if (error) {
+      alert("메모 저장에 실패했어요: " + error.message);
+      setNotes(previous);
+    }
+  }
+
   async function deleteNote(id: string) {
     const target = notes.find((n) => n.id === id);
     if (target && target.images.length > 0) {
@@ -97,11 +110,13 @@ export default function NotesTab({ active }: { active: boolean }) {
     <section className={`section-notes${active ? " block" : " hidden"}`}>
       <NoteForm onSubmit={createNote} />
       <NoteList notes={notes} loading={loading} onSelect={setDetailId} />
+      <NoteMemoList notes={notes} onSelect={setDetailId} />
       {detailNote && (
         <NoteDetailModal
           note={detailNote}
           onClose={() => setDetailId(null)}
           onDelete={() => deleteNote(detailNote.id)}
+          onUpdateMemo={(memo) => updateNoteMemo(detailNote.id, memo)}
         />
       )}
     </section>

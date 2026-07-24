@@ -5,6 +5,7 @@ import { FormEvent, useRef, useState } from "react";
 type Props = {
   onSubmit: (
     date: string,
+    memo: string,
     problemFiles: File[],
     mineFiles: File[],
     modelFiles: File[]
@@ -14,6 +15,7 @@ type Props = {
 export default function NoteForm({ onSubmit }: Props) {
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
+  const [memo, setMemo] = useState("");
   const [saving, setSaving] = useState(false);
   const problemRef = useRef<HTMLInputElement>(null);
   const mineRef = useRef<HTMLInputElement>(null);
@@ -34,11 +36,12 @@ export default function NoteForm({ onSubmit }: Props) {
     }
     setSaving(true);
     try {
-      await onSubmit(date, problemFiles, mineFiles, modelFiles);
+      await onSubmit(date, memo.trim(), problemFiles, mineFiles, modelFiles);
       if (problemRef.current) problemRef.current.value = "";
       if (mineRef.current) mineRef.current.value = "";
       if (modelRef.current) modelRef.current.value = "";
       setDate(today);
+      setMemo("");
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       alert("저장 중 오류가 발생했어요: " + message);
@@ -66,6 +69,15 @@ export default function NoteForm({ onSubmit }: Props) {
         <label>
           모범 답안 이미지
           <input type="file" accept="image/*" multiple ref={modelRef} />
+        </label>
+        <label>
+          메모 (주의해야 할 부분)
+          <textarea
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder="예: 배점 계산 실수함, 축척 표기 빠뜨림 등"
+            rows={3}
+          />
         </label>
         <button type="submit" disabled={saving}>
           {saving ? "저장 중..." : "저장"}

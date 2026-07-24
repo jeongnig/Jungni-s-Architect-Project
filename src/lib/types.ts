@@ -23,6 +23,7 @@ export type CalendarTask = {
 export type WrongNote = {
   id: string;
   date: string; // 'YYYY-MM-DD'
+  memo: string | null;
   created_at: string;
 };
 

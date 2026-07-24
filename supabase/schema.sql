@@ -45,12 +45,15 @@ alter table calendar_tasks add column if not exists restore_on_delete boolean no
 alter table calendar_tasks add column if not exists subject text;
 
 -- 3) 오답노트 (날짜 단위)
+-- memo: 이 날짜 오답노트에서 주의해야 할 점을 적어두는 메모
 create table if not exists wrong_notes (
   id uuid primary key default gen_random_uuid(),
   date date not null,
+  memo text,
   created_at timestamptz not null default now()
 );
 create index if not exists wrong_notes_date_idx on wrong_notes (date);
+alter table wrong_notes add column if not exists memo text;
 
 -- 4) 오답노트에 첨부된 이미지 (문제 / 내 답안 / 모범 답안, 각각 여러 장 가능)
 create table if not exists wrong_note_images (

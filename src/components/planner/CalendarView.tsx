@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarTask, CalendarTaskKind, Task, TaskSubject } from "@/lib/types";
+import { CalendarTask, CalendarTaskKind, Task } from "@/lib/types";
 import { YEAR, WEEKDAY_LABELS, currentWeekDates, dateKey } from "@/lib/dateUtils";
 import DayCell from "./DayCell";
 import TaskPickerModal from "./TaskPickerModal";
@@ -11,13 +11,8 @@ import MonthSummary from "./MonthSummary";
 type Props = {
   tasks: Task[];
   calendarTasks: CalendarTask[];
-  onAssign: (
-    date: string,
-    text: string,
-    kind?: CalendarTaskKind,
-    subject?: TaskSubject | null
-  ) => Promise<unknown>;
-  onDropAssign: (date: string, taskId: string, text: string, subject: TaskSubject | null) => Promise<void>;
+  onAssign: (date: string, text: string, kind?: CalendarTaskKind) => Promise<unknown>;
+  onDropAssign: (date: string, taskId: string, text: string) => Promise<void>;
   onToggleDone: (id: string, done: boolean) => void;
   onRemove: (id: string) => void;
 };
@@ -76,7 +71,7 @@ export default function CalendarView({
         onOpenWeek={() => setWeekDate(key)}
         onToggleDone={onToggleDone}
         onRemove={onRemove}
-        onDropTask={(taskId, text, subject) => onDropAssign(key, taskId, text, subject)}
+        onDropTask={(taskId, text) => onDropAssign(key, taskId, text)}
       />
     );
   }
@@ -162,8 +157,8 @@ export default function CalendarView({
         <TaskPickerModal
           dateStr={pickerDate}
           tasks={tasks}
-          onPick={async (text, kind, subject) => {
-            await onAssign(pickerDate, text, kind, subject);
+          onPick={async (text, kind) => {
+            await onAssign(pickerDate, text, kind);
             setPickerDate(null);
           }}
           onClose={() => setPickerDate(null)}

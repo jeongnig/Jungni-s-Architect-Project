@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { Task, CalendarTask, CalendarTaskKind, TaskSubject } from "@/lib/types";
+import { Task, CalendarTask, CalendarTaskKind, classifySubject } from "@/lib/types";
 import MasterTaskList from "./MasterTaskList";
 import CalendarView from "./CalendarView";
 import StatCards from "./StatCards";
@@ -36,7 +36,8 @@ export default function PlannerTab({ active }: { active: boolean }) {
     loadAll();
   }, [loadAll]);
 
-  async function addTask(text: string, subject: TaskSubject | null = null) {
+  async function addTask(text: string) {
+    const subject = classifySubject(text);
     const { data, error } = await supabase.from("tasks").insert({ text, subject }).select().single();
     if (error) {
       alert("추가에 실패했어요: " + error.message);
@@ -46,12 +47,13 @@ export default function PlannerTab({ active }: { active: boolean }) {
   }
 
   async function updateTask(id: string, text: string) {
-    const { error } = await supabase.from("tasks").update({ text }).eq("id", id);
+    const subject = classifySubject(text);
+    const { error } = await supabase.from("tasks").update({ text, subject }).eq("id", id);
     if (error) {
       alert("수정에 실패했어요: " + error.message);
       return;
     }
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, text } : t)));
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, text, subject } : t)));
   }
 
   async function deleteTask(id: string) {
@@ -67,9 +69,9 @@ export default function PlannerTab({ active }: { active: boolean }) {
     date: string,
     text: string,
     kind: CalendarTaskKind,
-    subject: TaskSubject | null,
     restoreOnDelete: boolean
   ) {
+    const subject = kind === "study" ? classifySubject(text) : null;
     const { data, error } = await supabase
       .from("calendar_tasks")
       .insert({ date, text, done: false, kind, restore_on_delete: restoreOnDelete, subject })
@@ -83,25 +85,15 @@ export default function PlannerTab({ active }: { active: boolean }) {
     return data as CalendarTask;
   }
 
-  async function assignTask(
-    date: string,
-    text: string,
-    kind: CalendarTaskKind = "study",
-    subject: TaskSubject | null = null
-  ) {
-    return insertCalendarTask(date, text, kind, subject, false);
+  async function assignTask(date: string, text: string, kind: CalendarTaskKind = "study") {
+    return insertCalendarTask(date, text, kind, false);
   }
 
   // 드래그로 배정한 경우: 캘린더에 넣은 뒤, 원본 항목은 "해야할 공부들 리스트"에서 사라지게 한다.
   // 드래그는 항상 공부 리스트에서 오는 것이므로 kind는 'study' 고정.
   // restoreOnDelete를 true로 남겨서, 나중에 이 캘린더 항목이 지워지면 리스트로 되돌아가게 한다.
-  async function assignTaskAndConsume(
-    date: string,
-    taskId: string,
-    text: string,
-    subject: TaskSubject | null
-  ) {
-    const created = await insertCalendarTask(date, text, "study", subject, true);
+  async function assignTaskAndConsume(date: string, taskId: string, text: string) {
+    const created = await insertCalendarTask(date, text, "study", true);
     if (!created) return;
     await deleteTask(taskId);
   }
@@ -127,7 +119,7 @@ export default function PlannerTab({ active }: { active: boolean }) {
     }
     // 드래그로 리스트에서 옮겨온 항목이었다면, 지웠을 때 다시 리스트로 되돌려준다.
     if (target?.restore_on_delete && target.kind === "study") {
-      await addTask(target.text, target.subject);
+      await addTask(target.text);
     }
   }
 

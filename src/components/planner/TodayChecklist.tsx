@@ -31,7 +31,7 @@ export default function TodayChecklist({ calendarTasks, onToggleDone }: Props) {
                 {t.done && "✓"}
               </button>
               <span className="today-check-text">{t.text}</span>
-              {t.subject && <SubjectTag subject={t.subject} />}
+              <SubjectTag text={t.text} />
             </li>
           ))}
         </ul>

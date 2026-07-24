@@ -279,7 +279,7 @@ main {
   .stat-cards { grid-template-columns: 1fr; }
 }
 
-/* subject tag / picker */
+/* subject tag (구조 / 단면 / 3교시 자동 분류) */
 .subject-tag {
   display: inline-block;
   font-size: 0.68rem;
@@ -292,26 +292,19 @@ main {
 
 .subject-tag.subject-gu { background: var(--violet-50); color: var(--violet-700); }
 .subject-tag.subject-dan { background: var(--pink-50); color: var(--pink-700); }
+.subject-tag.subject-3gyosi { background: var(--amber-50); color: var(--amber-700); }
 
-.subject-picker {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 14px;
+.day-task-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 3px;
 }
 
-.subject-picker-btn {
-  border: 1px solid var(--gray-200);
-  background: #fff;
-  color: var(--gray-500);
-  font-size: 0.76rem;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 999px;
-}
-
-.subject-picker-btn.subject-gu.active { background: var(--violet-50); border-color: var(--violet-400); color: var(--violet-700); }
-.subject-picker-btn.subject-dan.active { background: var(--pink-50); border-color: var(--pink-400); color: var(--pink-700); }
-.subject-picker-btn.active:not(.subject-gu):not(.subject-dan) { background: var(--gray-200); color: var(--navy-900); }
+.day-task-dot.subject-gu { background: var(--violet-500); }
+.day-task-dot.subject-dan { background: var(--pink-500); }
+.day-task-dot.subject-3gyosi { background: var(--amber-500); }
 
 /* today checklist */
 .today-checklist {

@@ -1,4 +1,17 @@
-export type TaskSubject = "구조" | "단면";
+export type TaskSubject = "구조" | "단면" | "3교시";
+
+// 텍스트에 "구조"/"단면"이 들어있으면 해당 과목으로, 아니면 "3교시"로 자동 분류한다.
+export function classifySubject(text: string): TaskSubject {
+  if (text.includes("구조")) return "구조";
+  if (text.includes("단면")) return "단면";
+  return "3교시";
+}
+
+export function subjectClassName(subject: TaskSubject): string {
+  if (subject === "구조") return "subject-gu";
+  if (subject === "단면") return "subject-dan";
+  return "subject-3gyosi";
+}
 
 export type Task = {
   id: string;

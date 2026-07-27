@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarTask, CalendarTaskKind, Task } from "@/lib/types";
 import { YEAR, WEEKDAY_LABELS, currentWeekDates, dateKey } from "@/lib/dateUtils";
 import DayCell from "./DayCell";
@@ -27,11 +27,27 @@ export default function CalendarView({
   onToggleDone,
   onRemove,
 }: Props) {
-  const initialMonth = new Date().getFullYear() === YEAR ? new Date().getMonth() : 0;
-  const [month, setMonth] = useState(initialMonth);
+  const [month, setMonth] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [pickerDate, setPickerDate] = useState<string | null>(null);
   const [weekDate, setWeekDate] = useState<string | null>(null);
+  const [todayStr, setTodayStr] = useState<string | null>(null);
+  const [weekCells, setWeekCells] = useState<Date[]>([]);
+
+  // 정적으로 미리 그려진 페이지가 이후에도 계속 서빙될 수 있으므로,
+  // "오늘"은 항상 이 컴포넌트가 브라우저에서 실제로 마운트된 시점에 새로 계산한다.
+  useEffect(() => {
+    const t = new Date();
+    setTodayStr(dateKey(t.getFullYear(), t.getMonth(), t.getDate()));
+    setWeekCells(currentWeekDates());
+    if (t.getFullYear() === YEAR) setMonth(t.getMonth());
+  }, []);
+
+  function goToToday() {
+    const t = new Date();
+    if (t.getFullYear() === YEAR) setMonth(t.getMonth());
+    setViewMode("month");
+  }
 
   const tasksByDate = useMemo(() => {
     const map = new Map<string, CalendarTask[]>();
@@ -43,11 +59,6 @@ export default function CalendarView({
     return map;
   }, [calendarTasks]);
 
-  const todayStr = (() => {
-    const t = new Date();
-    return dateKey(t.getFullYear(), t.getMonth(), t.getDate());
-  })();
-
   const firstDay = new Date(YEAR, month, 1).getDay();
   const daysInMonth = new Date(YEAR, month + 1, 0).getDate();
 
@@ -55,10 +66,8 @@ export default function CalendarView({
   for (let i = 0; i < firstDay; i++) monthCells.push(null);
   for (let d = 1; d <= daysInMonth; d++) monthCells.push(d);
 
-  const weekCells = useMemo(() => currentWeekDates(), []);
-
-  const startLabel = `${weekCells[0].getMonth() + 1}/${weekCells[0].getDate()}`;
-  const endLabel = `${weekCells[6].getMonth() + 1}/${weekCells[6].getDate()}`;
+  const startLabel = weekCells.length ? `${weekCells[0].getMonth() + 1}/${weekCells[0].getDate()}` : "";
+  const endLabel = weekCells.length ? `${weekCells[6].getMonth() + 1}/${weekCells[6].getDate()}` : "";
 
   function renderDayCell(key: string, dayNum: number) {
     return (
@@ -92,6 +101,9 @@ export default function CalendarView({
           onClick={() => setViewMode("month")}
         >
           월간
+        </button>
+        <button type="button" className="calendar-today-btn" onClick={goToToday}>
+          오늘
         </button>
       </div>
 

@@ -520,6 +520,12 @@ main {
   box-shadow: 0 4px 10px rgba(212, 83, 126, 0.3);
 }
 
+.calendar-today-btn {
+  color: var(--pink-700);
+  background: #fff;
+  border: 1px solid var(--pink-300);
+}
+
 .calendar-header {
   display: flex;
   align-items: center;

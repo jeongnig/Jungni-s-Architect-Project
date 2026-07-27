@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
+import { getErrorMessage } from "@/lib/errors";
 
 type Props = {
   onSubmit: (
@@ -43,8 +44,7 @@ export default function NoteForm({ onSubmit }: Props) {
       setDate(today);
       setMemo("");
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      alert("저장 중 오류가 발생했어요: " + message);
+      alert("저장 중 오류가 발생했어요: " + getErrorMessage(err));
     } finally {
       setSaving(false);
     }

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { withRetry } from "@/lib/supabaseRetry";
 import { NOTE_IMAGE_BUCKET } from "@/lib/constants";
 import { NoteImageKind, WrongNote, WrongNoteImage, WrongNoteWithImages } from "@/lib/types";
 import NoteForm from "./NoteForm";
@@ -18,11 +19,13 @@ export default function NotesTab({ active }: { active: boolean }) {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("wrong_notes")
-      .select("*, wrong_note_images(*)")
-      .order("date", { ascending: false })
-      .order("created_at", { ascending: false });
+    const { data, error } = await withRetry(() =>
+      supabase
+        .from("wrong_notes")
+        .select("*, wrong_note_images(*)")
+        .order("date", { ascending: false })
+        .order("created_at", { ascending: false })
+    );
     if (error) {
       console.error(error);
       setNotes([]);
@@ -44,11 +47,9 @@ export default function NotesTab({ active }: { active: boolean }) {
     mineFiles: File[],
     modelFiles: File[]
   ) {
-    const { data: note, error } = await supabase
-      .from("wrong_notes")
-      .insert({ date, memo: memo || null })
-      .select()
-      .single();
+    const { data: note, error } = await withRetry(() =>
+      supabase.from("wrong_notes").insert({ date, memo: memo || null }).select().single()
+    );
     if (error || !note) throw error ?? new Error("오답노트 생성에 실패했어요.");
 
     const uploads: { kind: NoteImageKind; file: File }[] = [
@@ -66,11 +67,13 @@ export default function NotesTab({ active }: { active: boolean }) {
         .upload(path, file);
       if (uploadError) throw uploadError;
 
-      const { data: row, error: rowError } = await supabase
-        .from("wrong_note_images")
-        .insert({ note_id: note.id, kind, storage_path: path })
-        .select()
-        .single();
+      const { data: row, error: rowError } = await withRetry(() =>
+        supabase
+          .from("wrong_note_images")
+          .insert({ note_id: note.id, kind, storage_path: path })
+          .select()
+          .single()
+      );
       if (rowError) throw rowError;
       imageRows.push(row as WrongNoteImage);
     }
@@ -82,7 +85,9 @@ export default function NotesTab({ active }: { active: boolean }) {
     const value = memo.trim() || null;
     const previous = notes;
     setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, memo: value } : n)));
-    const { error } = await supabase.from("wrong_notes").update({ memo: value }).eq("id", id);
+    const { error } = await withRetry(() =>
+      supabase.from("wrong_notes").update({ memo: value }).eq("id", id)
+    );
     if (error) {
       alert("메모 저장에 실패했어요: " + error.message);
       setNotes(previous);
@@ -95,7 +100,7 @@ export default function NotesTab({ active }: { active: boolean }) {
       const paths = target.images.map((img) => img.storage_path);
       await supabase.storage.from(NOTE_IMAGE_BUCKET).remove(paths);
     }
-    const { error } = await supabase.from("wrong_notes").delete().eq("id", id);
+    const { error } = await withRetry(() => supabase.from("wrong_notes").delete().eq("id", id));
     if (error) {
       alert("삭제에 실패했어요: " + error.message);
       return;

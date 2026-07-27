@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { withRetry } from "@/lib/supabaseRetry";
 import { EXAM_REVIEW_SUBJECTS } from "@/lib/constants";
 import { EXAM_SESSIONS, sessionKey, sessionLabel } from "@/lib/examSessions";
 import { ExamReview, ExamReviewStatus } from "@/lib/types";
@@ -24,10 +25,12 @@ export default function ExamReviewTracker() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("exam_reviews")
-      .select("*")
-      .in("subject", EXAM_REVIEW_SUBJECTS as unknown as string[]);
+    const { data, error } = await withRetry(() =>
+      supabase
+        .from("exam_reviews")
+        .select("*")
+        .in("subject", EXAM_REVIEW_SUBJECTS as unknown as string[])
+    );
     if (error) {
       console.error(error);
       setStatusMap({});
@@ -57,9 +60,13 @@ export default function ExamReviewTracker() {
       return copy;
     });
 
-    const { error } = await supabase.from("exam_reviews").upsert(
-      { subject, year, round, status: next, updated_at: new Date().toISOString() },
-      { onConflict: "subject,year,round" }
+    const { error } = await withRetry(() =>
+      supabase
+        .from("exam_reviews")
+        .upsert(
+          { subject, year, round, status: next, updated_at: new Date().toISOString() },
+          { onConflict: "subject,year,round" }
+        )
     );
 
     if (error) {

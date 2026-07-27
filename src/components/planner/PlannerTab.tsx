@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { withRetry } from "@/lib/supabaseRetry";
 import { Task, CalendarTask, CalendarTaskKind, classifySubject } from "@/lib/types";
 import MasterTaskList from "./MasterTaskList";
 import CalendarView from "./CalendarView";
@@ -16,14 +17,16 @@ export default function PlannerTab({ active }: { active: boolean }) {
   const loadAll = useCallback(async () => {
     setLoading(true);
     const [tasksRes, calRes] = await Promise.all([
-      supabase.from("tasks").select("*").order("created_at", { ascending: true }),
-      supabase
-        .from("calendar_tasks")
-        .select("*")
-        .gte("date", "2026-01-01")
-        .lte("date", "2026-12-31")
-        .order("date", { ascending: true })
-        .order("created_at", { ascending: true }),
+      withRetry(() => supabase.from("tasks").select("*").order("created_at", { ascending: true })),
+      withRetry(() =>
+        supabase
+          .from("calendar_tasks")
+          .select("*")
+          .gte("date", "2026-01-01")
+          .lte("date", "2026-12-31")
+          .order("date", { ascending: true })
+          .order("created_at", { ascending: true })
+      ),
     ]);
     if (tasksRes.error) console.error(tasksRes.error);
     if (calRes.error) console.error(calRes.error);
@@ -38,7 +41,9 @@ export default function PlannerTab({ active }: { active: boolean }) {
 
   async function addTask(text: string) {
     const subject = classifySubject(text);
-    const { data, error } = await supabase.from("tasks").insert({ text, subject }).select().single();
+    const { data, error } = await withRetry(() =>
+      supabase.from("tasks").insert({ text, subject }).select().single()
+    );
     if (error) {
       alert("추가에 실패했어요: " + error.message);
       return;
@@ -48,7 +53,9 @@ export default function PlannerTab({ active }: { active: boolean }) {
 
   async function updateTask(id: string, text: string) {
     const subject = classifySubject(text);
-    const { error } = await supabase.from("tasks").update({ text, subject }).eq("id", id);
+    const { error } = await withRetry(() =>
+      supabase.from("tasks").update({ text, subject }).eq("id", id)
+    );
     if (error) {
       alert("수정에 실패했어요: " + error.message);
       return;
@@ -57,7 +64,7 @@ export default function PlannerTab({ active }: { active: boolean }) {
   }
 
   async function deleteTask(id: string) {
-    const { error } = await supabase.from("tasks").delete().eq("id", id);
+    const { error } = await withRetry(() => supabase.from("tasks").delete().eq("id", id));
     if (error) {
       alert("삭제에 실패했어요: " + error.message);
       return;
@@ -72,11 +79,13 @@ export default function PlannerTab({ active }: { active: boolean }) {
     restoreOnDelete: boolean
   ) {
     const subject = kind === "study" ? classifySubject(text) : null;
-    const { data, error } = await supabase
-      .from("calendar_tasks")
-      .insert({ date, text, done: false, kind, restore_on_delete: restoreOnDelete, subject })
-      .select()
-      .single();
+    const { data, error } = await withRetry(() =>
+      supabase
+        .from("calendar_tasks")
+        .insert({ date, text, done: false, kind, restore_on_delete: restoreOnDelete, subject })
+        .select()
+        .single()
+    );
     if (error) {
       alert("배정에 실패했어요: " + error.message);
       return null;
@@ -100,7 +109,9 @@ export default function PlannerTab({ active }: { active: boolean }) {
 
   async function toggleDone(id: string, done: boolean) {
     setCalendarTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done } : t)));
-    const { error } = await supabase.from("calendar_tasks").update({ done }).eq("id", id);
+    const { error } = await withRetry(() =>
+      supabase.from("calendar_tasks").update({ done }).eq("id", id)
+    );
     if (error) {
       alert("업데이트에 실패했어요: " + error.message);
       setCalendarTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done: !done } : t)));
@@ -111,7 +122,7 @@ export default function PlannerTab({ active }: { active: boolean }) {
     const target = calendarTasks.find((t) => t.id === id);
     const previous = calendarTasks;
     setCalendarTasks(previous.filter((t) => t.id !== id));
-    const { error } = await supabase.from("calendar_tasks").delete().eq("id", id);
+    const { error } = await withRetry(() => supabase.from("calendar_tasks").delete().eq("id", id));
     if (error) {
       alert("삭제에 실패했어요: " + error.message);
       setCalendarTasks(previous);

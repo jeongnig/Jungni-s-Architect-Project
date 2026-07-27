@@ -709,11 +709,23 @@ main {
   line-height: 1.2;
 }
 
-.day-task-list li input[type="checkbox"] {
-  margin-top: 1px;
+.day-check-circle {
   flex-shrink: 0;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
+  margin-top: 3px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--pink-300);
+  background: #fff;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.day-check-circle:hover { transform: scale(1.15); }
+
+.day-check-circle.checked {
+  background: var(--pink-500);
+  border-color: var(--pink-500);
 }
 
 .day-task-list li span {
@@ -1015,8 +1027,7 @@ main {
   gap: 6px;
 }
 
-.note-gallery-thumb,
-.note-gallery-empty {
+.note-gallery-thumb {
   position: relative;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
@@ -1056,12 +1067,6 @@ main {
 .note-gallery-badge.problem { background: rgba(83, 74, 183, 0.85); }
 .note-gallery-badge.mine { background: rgba(212, 83, 126, 0.85); }
 .note-gallery-badge.model { background: rgba(220, 38, 38, 0.85); }
-
-.note-gallery-empty {
-  border: 1px dashed var(--gray-200);
-  color: var(--gray-500);
-  font-size: 0.68rem;
-}
 
 /* modal */
 .modal-overlay {

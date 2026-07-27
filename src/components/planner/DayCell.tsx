@@ -103,10 +103,11 @@ export default function DayCell({
             {t.kind !== "event" && (
               <>
                 <span className={`day-task-dot ${subjectClassName(classifySubject(t.text))}`} />
-                <input
-                  type="checkbox"
-                  checked={t.done}
-                  onChange={(e) => onToggleDone(t.id, e.target.checked)}
+                <button
+                  type="button"
+                  className={`day-check-circle${t.done ? " checked" : ""}`}
+                  onClick={() => onToggleDone(t.id, !t.done)}
+                  aria-label={t.done ? "완료 취소" : "완료 표시"}
                 />
               </>
             )}
